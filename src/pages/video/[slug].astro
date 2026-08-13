@@ -1,0 +1,46 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import VideoMeta from "../../components/VideoMeta.astro";
+import EpisodeList from "../../components/EpisodeList.astro";
+import { getAllVideos, getVideo } from "../../lib/videos";
+
+export async function getStaticPaths() {
+  const videos = await getAllVideos();
+  return videos.map((video) => ({
+    params: { slug: video.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const video = await getVideo(slug!);
+if (!video) {
+  throw new Error(`Video "${slug}" 不存在`);
+}
+
+const { title, tags, description, cover, episodes } = video.data;
+const { Content } = await video.render();
+---
+
+<Layout title={title} description={description ?? title}>
+  <div class="cover-hero">
+    <img
+      src={cover}
+      alt={title}
+      width="1280"
+      height="720"
+      onerror="this.onerror=null;this.src='/default-cover.webp';"
+    />
+  </div>
+
+  <div class="detail-main">
+    <VideoMeta title={title} tags={tags} description={description} />
+    <div class="prose">
+      <Content />
+    </div>
+  </div>
+
+  <section class="detail-episodes">
+    <h2 class="section-title">选集</h2>
+    <EpisodeList videoSlug={slug!} episodes={episodes} />
+  </section>
+</Layout>

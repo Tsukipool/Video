@@ -1,0 +1,23 @@
+---
+import { tagSlug } from "../lib/slug";
+
+interface Props {
+  title: string;
+  tags: string[];
+  description?: string;
+}
+
+const { title, tags, description } = Astro.props;
+---
+
+<h1 class="video-title">{title}</h1>
+
+<div class="video-meta-tags">
+  {tags.map((tag) => (
+    <a class="tag-link" href={`/tag/${tagSlug(tag)}`}>
+      #{tag}
+    </a>
+  ))}
+</div>
+
+{description && <p class="video-description">{description}</p>}

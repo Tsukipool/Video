@@ -1,0 +1,138 @@
+---
+interface Props {
+  source: string;
+  poster?: string;
+  title: string;
+  episodeTitle?: string;
+}
+
+const { source, poster, title, episodeTitle } = Astro.props;
+const ariaLabel = episodeTitle ? `${title} - ${episodeTitle}` : title;
+---
+
+<div class="player-wrap" data-player data-source={source}>
+  <video
+    controls
+    playsinline
+    preload="metadata"
+    poster={poster}
+    aria-label={ariaLabel}
+    data-video
+  ></video>
+
+  <div class="player-overlay" data-error hidden aria-live="assertive" role="alert">
+    <p class="overlay-title">视频加载失败</p>
+    <p class="overlay-hint" data-error-message>请稍后重试</p>
+    <button class="retry-button" type="button" data-retry>重新加载</button>
+  </div>
+</div>
+
+<script>
+  import Hls, { Events, ErrorTypes, type Level } from "hls.js";
+
+  const wrap = document.querySelector<HTMLElement>("[data-player]")!;
+  const video = wrap.querySelector<HTMLVideoElement>("[data-video]")!;
+  const errorEl = wrap.querySelector<HTMLElement>("[data-error]")!;
+  const errorMessageEl = wrap.querySelector<HTMLElement>("[data-error-message]")!;
+  const retryButton = wrap.querySelector<HTMLButtonElement>("[data-retry]")!;
+  const source = wrap.dataset.source!;
+
+  let hls: Hls | null = null;
+  let native = false;
+
+  function showError(message = "请稍后重试") {
+    errorMessageEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  function destroyHls() {
+    if (hls) {
+      hls.destroy();
+      hls = null;
+    }
+    wrap.querySelector<HTMLElement>("[data-quality]")?.remove();
+  }
+
+  function buildQualityMenu(levels: Level[]) {
+    const existing = wrap.querySelector<HTMLElement>("[data-quality]");
+    existing?.remove();
+
+    const select = document.createElement("select");
+    select.setAttribute("data-quality", "");
+    select.setAttribute("aria-label", "选择清晰度");
+
+    const auto = document.createElement("option");
+    auto.value = "-1";
+    auto.textContent = "自动";
+    select.appendChild(auto);
+
+    const allowedHeights = [1080, 720];
+    const candidates = levels
+      .map((level, index) => ({ level, index }))
+      .filter(({ level }) => allowedHeights.includes(level.height))
+      .sort((a, b) => b.level.height - a.level.height);
+    const menu = candidates.length > 0 ? candidates : levels.map((level, index) => ({ level, index }));
+
+    menu.forEach(({ level, index }) => {
+      const option = document.createElement("option");
+      option.value = String(index);
+      option.textContent = `${level.height}p`;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", () => {
+      if (!hls) return;
+      hls.currentLevel = Number(select.value);
+    });
+
+    select.className = "player-quality";
+    wrap.appendChild(select);
+  }
+
+  function init() {
+    destroyHls();
+    native = false;
+    errorEl.hidden = true;
+
+    if (Hls.isSupported()) {
+      hls = new Hls();
+      hls.loadSource(source);
+      hls.attachMedia(video);
+
+      hls.on(Events.MANIFEST_PARSED, () => {
+        if (hls && hls.levels.length > 1) {
+          buildQualityMenu(hls.levels);
+        }
+      });
+
+      hls.on(Events.ERROR, (_event, data) => {
+        if (!data.fatal) return;
+        switch (data.type) {
+          case ErrorTypes.NETWORK_ERROR:
+            showError("网络错误，请检查网络连接后重试");
+            break;
+          case ErrorTypes.MEDIA_ERROR:
+            showError("视频数据加载失败，请稍后重试");
+            break;
+          default:
+            showError("视频加载失败，请稍后重试");
+        }
+        destroyHls();
+      });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      native = true;
+      video.src = source;
+    } else {
+      showError("当前浏览器不支持 HLS 播放");
+      return;
+    }
+  }
+
+  video.addEventListener("error", () => {
+    if (!native) return;
+    showError("视频加载失败，请稍后重试");
+  });
+
+  retryButton.addEventListener("click", init);
+  init();
+</script>

@@ -1,0 +1,40 @@
+---
+import type { VideoEntry } from "../lib/videos";
+import { tagSlug } from "../lib/slug";
+
+interface Props {
+  video: VideoEntry;
+}
+
+const { video } = Astro.props;
+const { title, cover, tags, episodes } = video.data;
+const slug = video.slug;
+const episodeCount = episodes.length;
+---
+
+<a class="video-card" href={`/video/${slug}`} aria-label={`${title}，${episodeCount} 集`}>
+  <div class="video-card-cover">
+    <img
+      src={cover}
+      alt={title}
+      loading="lazy"
+      decoding="async"
+      width="1280"
+      height="720"
+      onerror="this.onerror=null;this.src='/default-cover.webp';"
+    />
+    <span class="video-card-episode-count">{episodeCount} 集</span>
+  </div>
+  <div class="video-card-body">
+    <h2 class="video-card-title">{title}</h2>
+    <div class="video-card-tags">
+      {tags.map((tag) => (
+        <span>{tag}</span>
+      ))}
+    </div>
+  </div>
+  <span class="card-go">
+    立即观看
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </span>
+</a>

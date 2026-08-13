@@ -1,0 +1,23 @@
+---
+import type { VideoEntry } from "../lib/videos";
+import VideoCard from "./VideoCard.astro";
+
+interface Props {
+  videos: VideoEntry[];
+}
+
+const { videos } = Astro.props;
+---
+
+{videos.length > 0 ? (
+  <div class="video-grid">
+    {videos.map((video) => (
+      <VideoCard video={video} />
+    ))}
+  </div>
+) : (
+  <div class="empty-state">
+    <p class="empty-title">没有找到视频</p>
+    <p>暂时没有符合条件的内容。</p>
+  </div>
+)}

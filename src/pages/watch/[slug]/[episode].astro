@@ -1,0 +1,38 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import VideoMeta from "../../../components/VideoMeta.astro";
+import EpisodeList from "../../../components/EpisodeList.astro";
+import VideoPlayer from "../../../components/VideoPlayer.astro";
+import { getAllVideos, getVideo, getEpisode } from "../../../lib/videos";
+
+export async function getStaticPaths() {
+  const videos = await getAllVideos();
+  return videos.flatMap((video) =>
+    video.data.episodes.map((episode) => ({
+      params: { slug: video.slug, episode: episode.id },
+    }))
+  );
+}
+
+const { slug, episode: episodeId } = Astro.params;
+const video = await getVideo(slug!);
+const episode = video ? getEpisode(video, episodeId!) : undefined;
+if (!video || !episode) {
+  throw new Error(`Episode "${slug}/${episodeId}" 不存在`);
+}
+
+const { title, tags, description, cover, episodes } = video.data;
+---
+
+<Layout title={`${title} - ${episode.title}`} description={description ?? title}>
+  <a class="back-link" href={`/video/${slug}`}>← 返回视频详情</a>
+
+  <VideoPlayer source={episode.source} poster={cover} title={title} episodeTitle={episode.title} />
+
+  <div class="watch-meta">
+    <VideoMeta title={title} tags={tags} />
+  </div>
+
+  <h2 class="section-title">选集</h2>
+  <EpisodeList videoSlug={slug!} episodes={episodes} currentId={episode.id} />
+</Layout>

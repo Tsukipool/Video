@@ -1,0 +1,31 @@
+---
+import type { Episode } from "../types/video";
+
+interface Props {
+  videoSlug: string;
+  episodes: Episode[];
+  currentId?: string;
+  variant?: "grid" | "scroll";
+}
+
+const { videoSlug, episodes, currentId, variant = "grid" } = Astro.props;
+const scroll = variant === "scroll";
+---
+
+<div class={scroll ? "episode-list episode-list--scroll" : "episode-list"} role="list" aria-label="选集">
+  {episodes.map((episode) => {
+    const current = episode.id === currentId;
+    return (
+      <a
+        class="episode-item"
+        role="listitem"
+        href={`/watch/${videoSlug}/${episode.id}`}
+        aria-current={current ? "true" : undefined}
+        aria-label={`第 ${episode.id} 集：${episode.title}`}
+      >
+        <span class="episode-number">{episode.id}</span>
+        {episode.title}
+      </a>
+    );
+  })}
+</div>
