@@ -373,7 +373,6 @@ h1, h2, h3, h4, p { margin: 0; }
   color: var(--text-muted);
   font-size: 0.9rem;
   line-height: 1.8;
-  max-width: 62ch;
 }
 
 /* ---------- Episode List ---------- */
@@ -470,7 +469,6 @@ h1, h2, h3, h4, p { margin: 0; }
 
 .prose {
   margin-top: 1.5rem;
-  max-width: 72ch;
   font-size: 0.9rem;
   line-height: 1.8;
   color: var(--text-muted);
