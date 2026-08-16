@@ -306,13 +306,14 @@ h1, h2, h3, h4, p { margin: 0; }
 
 .video-card-tags span {
   display: inline-block;
-  padding: 1px 8px;
+  padding: 0 6px;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
   line-height: 1.6;
   letter-spacing: 0.08em;
+  font-size: 0.58rem;
 }
 
 .card-go {
@@ -335,12 +336,12 @@ h1, h2, h3, h4, p { margin: 0; }
 
 .tag-link {
   display: inline-block;
-  padding: 2px 12px;
+  padding: 0 8px;
   border: 1px solid var(--border-soft);
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   line-height: 1.6;
   letter-spacing: 0.08em;
   transition: border-color 0.2s, color 0.2s, transform 0.15s;
