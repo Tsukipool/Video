@@ -112,6 +112,14 @@ h1, h2, h3, h4, p { margin: 0; }
   color: var(--text);
   letter-spacing: 0.12em;
   white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.logo-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .logo:hover { text-decoration: none; opacity: 0.85; }
 
@@ -807,7 +815,7 @@ h1, h2, h3, h4, p { margin: 0; }
   }
 
   .header-search input {
-    width: min(9rem, 38vw);
+    width: min(8rem, 30vw);
     max-width: none;
     font-size: 0.8rem;
   }
