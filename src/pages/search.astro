@@ -76,7 +76,28 @@ const initialQuery = Astro.url.searchParams.get("q") ?? "";
     }
 
     body.append(title, tags);
-    link.append(coverWrap, body);
+
+    const go = document.createElement("span");
+    go.className = "card-go";
+    go.textContent = "立即观看";
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("fill", "none");
+    icon.setAttribute("stroke", "currentColor");
+    icon.setAttribute("stroke-width", "2");
+    icon.setAttribute("stroke-linecap", "round");
+    icon.setAttribute("stroke-linejoin", "round");
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", "5");
+    line.setAttribute("y1", "12");
+    line.setAttribute("x2", "19");
+    line.setAttribute("y2", "12");
+    const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    polyline.setAttribute("points", "12 5 19 12 12 19");
+    icon.append(line, polyline);
+    go.appendChild(icon);
+
+    link.append(coverWrap, body, go);
     return link;
   }
 
