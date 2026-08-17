@@ -26,18 +26,7 @@ export function tagSlug(name: string): string {
   if (isAsciiSlug(trimmed)) return trimmed;
   const mapped = TAG_SLUG_MAP[trimmed];
   if (mapped) return mapped;
-  let result = "";
-  for (const char of trimmed) {
-    if (isAsciiSlug(char)) {
-      result += char.toLowerCase();
-    } else {
-      result += char
-        .codePointAt(0)!
-        .toString(16)
-        .padStart(4, "0");
-    }
-  }
-  return result || "tag";
+  return trimmed;
 }
 
 export function tagNameFromSlug(slug: string): string | undefined {
